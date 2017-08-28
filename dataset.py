@@ -1,7 +1,15 @@
 from download import Download
 
 class Dataset:
-    def __init__(self, result):
+
+
+    def __init__(self, data, from_json):
+        if from_json:
+            self.init_from_json(data)
+        else:
+            self.init_from_result(data)
+
+    def init_from_result(self, result):
         self.name = self.parse_name(result.get("display_name"))
         self.description = self.parse_name(result.get("description"))
         self.organization_name = self.parse_name(result.get("organization").get("display_name"))
@@ -10,6 +18,14 @@ class Dataset:
         self.downloads = self.parse_downloads(result.get("resources"))
         self.id = result.get("name")
 
+    def init_from_json(self, json):
+        self.name = json.get('name')
+        self.description = json.get('description')
+        self.organization_name = json.get('organization').get('name')
+        self.political_level = json.get('organization').get('political_level')
+        self.tags = json.get('tags')
+        self.downloads =  [Download(download, download.get('url'), self) for download in json['downloads']]
+        self.id = json.get('id')
 
     def parse_name(self, name):
         if(name == None):
@@ -38,9 +54,8 @@ class Dataset:
             if not url:
                 url = download_json['url']
 
-            print url
 
-            downloads_data.append(Download(download_json, url))
+            downloads_data.append(Download(download_json, url, self))
 
         return downloads_data
 

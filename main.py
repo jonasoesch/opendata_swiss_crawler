@@ -3,6 +3,7 @@ import ssl
 import json
 import time
 from dataset import Dataset
+import os
 
 # Data-Structure:
 #
@@ -23,18 +24,38 @@ from dataset import Dataset
 #   size
 
 
+min_number = 700
+max_number = 705
+result_json = 'opendata.swiss.datasets.json'
 
-max_number = 10
+
+keep_data = True
 
 
 def dump(datasets):
-    with open('opendata.swiss.datasets.json', 'w') as fp:
+    with open(result_json, 'w') as fp:
         fp.write(
             json.dumps(
                 [dataset.serialize() for dataset in datasets],
                 indent=4, separators=(',', ': ')
             )
         )
+
+
+
+def resume():
+    try:
+        with open(result_json, 'r') as file:
+            datasets = []
+            for dataset in json.load(file):
+                dataset_object = Dataset(dataset, True)
+                datasets.append(dataset_object)
+
+            return datasets
+    except Exception:
+        return []
+
+
 
 # Get the list of Datasets
 r = requests.get("https://opendata.swiss/api/3/action/package_list")
@@ -48,28 +69,59 @@ packages = r.json()
 #     ]
 # }
 
-datasets = []
+datasets = resume()
 
+
+print datasets
 
 for i, package in enumerate(packages['result']):
     dataset_name = package #packages['result'][i]
-    time.sleep(0.2)
+    dataset = None
 
-    if (i > max_number): print i; break
+    if (i > max_number): break
+    if (i < min_number): continue
 
-    try:
-        dataset = requests.get("https://opendata.swiss/api/3/action/package_show?id=" + dataset_name)
-    except (ssl.SSLError):
-        continue
+    exists = False
+    for ds in datasets:
+        if (ds.id == dataset_name):
+            print "Reading from cache: " + ds.id
+            dataset = ds
+            break
 
 
-    if dataset.status_code == 200:
-        result = dataset.json()['result']
-        print dataset_name
-        data = Dataset(result)
-        datasets.append(data)
-    else:
-        print "Status code " + dataset.status_code
+    if not(dataset):
+        time.sleep(0.2)
+
+
+        try:
+            ds = requests.get("https://opendata.swiss/api/3/action/package_show?id=" + dataset_name)
+        except (ssl.SSLError):
+            continue
+
+
+        if ds.status_code == 200:
+            print "Adding: " + dataset_name
+            result = ds.json()['result']
+            dataset = Dataset(result, False)
+            datasets.append(dataset)
+
+        else:
+            print "Status code " + ds.status_code
+
+
+
+    for dl in dataset.downloads:
+        if not(dl.status == 'Downloaded' or dl.status == "Analyzed"):
+            print "Downloading..."
+            dl.download()
+        if not(dl.status == 'Analyzed'):
+            print "Analyzing..."
+            dl.analyze()
+
+        if(not(keep_data) and dl.status == "Analyzed"):
+            dl.delete_file()
+
+
 
     dump(datasets)
 
