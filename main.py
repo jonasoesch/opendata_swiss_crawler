@@ -24,8 +24,8 @@ import os
 #   size
 
 
-min_number = 700
-max_number = 705
+min_number = 0
+max_number = 5000
 result_json = 'opendata.swiss.datasets.json'
 
 
@@ -75,6 +75,7 @@ datasets = resume()
 print datasets
 
 for i, package in enumerate(packages['result']):
+
     dataset_name = package #packages['result'][i]
     dataset = None
 
@@ -84,7 +85,7 @@ for i, package in enumerate(packages['result']):
     exists = False
     for ds in datasets:
         if (ds.id == dataset_name):
-            print "Reading from cache: " + ds.id
+            print "Reading from cache: " + str(i) + ". "+ ds.id
             dataset = ds
             break
 
@@ -94,21 +95,20 @@ for i, package in enumerate(packages['result']):
 
 
         try:
+            print "https://opendata.swiss/api/3/action/package_show?id=" + dataset_name
             ds = requests.get("https://opendata.swiss/api/3/action/package_show?id=" + dataset_name)
         except (ssl.SSLError):
             continue
 
 
         if ds.status_code == 200:
-            print "Adding: " + dataset_name
+            print "Adding: " + str(i) + ". " + dataset_name
             result = ds.json()['result']
             dataset = Dataset(result, False)
             datasets.append(dataset)
 
         else:
             print "Status code " + ds.status_code
-
-
 
     for dl in dataset.downloads:
         if not(dl.status == 'Downloaded' or dl.status == "Analyzed"):
@@ -120,8 +120,6 @@ for i, package in enumerate(packages['result']):
 
         if(not(keep_data) and dl.status == "Analyzed"):
             dl.delete_file()
-
-
 
     dump(datasets)
 
