@@ -63,20 +63,22 @@ class Download:
             r = requests.get(self.url, stream=True)
             r.raise_for_status()
         except requests.exceptions.ConnectionError:
-            self.update_with_dl_information(error='connection')
+            return self.update_with_dl_information(error='connection')
         except requests.exceptions.Timeout:
-            self.update_with_dl_information(error='timeout')
+            return self.update_with_dl_information(error='timeout')
         except requests.exceptions.TooManyRedirects:
-            self.update_with_dl_information(error='too many redirects')
+            return self.update_with_dl_information(error='too many redirects')
         except requests.exceptions.HTTPError:
-            self.update_with_dl_information(status_code=r.status_code, error='http')
+            return self.update_with_dl_information(status_code=r.status_code, error='http')
 
-
-        # Write to file
-        with open(path, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=1024):
-                if chunk: # filter out keep-alive new chunks
-                    f.write(chunk)
+        try:
+            # Write to file
+            with open(path, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=1024):
+                    if chunk: # filter out keep-alive new chunks
+                        f.write(chunk)
+        except requests.exceptions.ChunkedEncodingError:
+            print "Chunk encoding error"
 
         self.update_with_dl_information(path=path, status_code=r.status_code, content_type=r.headers['Content-Type'])
 

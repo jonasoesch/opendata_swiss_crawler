@@ -24,7 +24,7 @@ import os
 #   size
 
 
-min_number = 0
+min_number = 1900 
 max_number = 5000
 result_json = 'opendata.swiss.datasets.json'
 
@@ -71,8 +71,6 @@ packages = r.json()
 
 datasets = resume()
 
-
-print datasets
 
 for i, package in enumerate(packages['result']):
 

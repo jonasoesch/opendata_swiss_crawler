@@ -30,7 +30,10 @@ class Analyzer:
         else:
             total = self.do_undef(download)
 
-        download.file_size = os.path.getsize(download.path)
+        try:
+            download.file_size = os.path.getsize(download.path)
+        except TypeError:
+            download.file_size = 'undefined'
         download.total = total
         download.dimensions = self.dimensions
 
@@ -45,6 +48,12 @@ class Analyzer:
     def do_csv(self, download):
         lines = 0
         cols = 0
+
+        if not(download):
+            return
+        if not(download.path):
+            return
+
         with open(download.path, 'r') as file:
             try:
                 dialect = unicodecsv.Sniffer().sniff(file.read(8192))
@@ -115,7 +124,12 @@ class Analyzer:
             return 'zip exception'
 
     def do_xls(self, download):
+        if not(download):
+            return
 
+        if not(download.path):
+        	return
+        
         copy_path = download.path + '.xlsx'
         try:
             shutil.copy(download.path, copy_path)
