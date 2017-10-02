@@ -26,7 +26,7 @@ class Download:
         self.id = str(uuid.uuid4())
         self.dataset = None
         self.status = 'Untouched'
-        self.path = cfg.data_dir 
+        self.filepath = cfg.data_dir 
 
     def __init__(self, json, url, dataset):
         self.format = json.get("format")
@@ -47,7 +47,7 @@ class Download:
         self.total = json.get('total', '')
         self.dimensions = json.get('dimensions', '')
         self.file_size = json.get('file_size', '')
-        self.path = cfg.data_dir
+        self.filepath = cfg.data_dir
 
 
 
@@ -55,7 +55,7 @@ class Download:
     def download(self):
 
         self.set_dir()
-        path = self.get_dir() + '/' + self.id
+        path = self.filepath = self.filepath + '/' + self.id
 
 
         if(self.format == 'MULTIFORMAT'):
@@ -85,7 +85,7 @@ class Download:
 
         self.update_with_dl_information(path=path, status_code=r.status_code, content_type=r.headers['Content-Type'])
 
-        if not(self.dl_error):
+        if not(self.dl_error) and cfg.keep_data:
             self.status = 'Downloaded'
 
 
@@ -128,30 +128,30 @@ class Download:
     def set_dir(self):
 
         try:
-            if not os.path.exists(self.path):
-                os.makedirs(self.path)
+            if not os.path.exists(self.filepath):
+                os.makedirs(self.filepath)
         except Exception as e:
             print "Couldn't find nor create the target directory for the data"
             raise e
 
         # Creating the directory structure -> organization/dataset
         try:
-            self.path = self.path + "/" + self.dataset.organization_name
-            if not os.path.exists(self.path):
-                os.makedirs(self.path)
+            self.filepath = self.filepath + "/" + self.dataset.organization_name
+            if not os.path.exists(self.filepath):
+                os.makedirs(self.filepath)
         except Exception as e:
             print self.dataset.name + ": Orga dir: " + str(e)
 
         try:
-            self.path = self.path + '/' + self.dataset.id
-            if not os.path.exists(self.path):
-                os.makedirs(self.path)
+            self.filepath = self.filepath + '/' + self.dataset.id
+            if not os.path.exists(self.filepath):
+                os.makedirs(self.filepath)
         except Exception as e:
             print self.dataset.name + ": Dataset dir: " + str(e)
 
 
     def get_dir(self):
-        return self.path
+        return self.filepath
 
 
     def analyze(self):
@@ -159,10 +159,11 @@ class Download:
 
     def delete_file(self):
         try:
-            os.unlink(self.path)
+            os.unlink(self.filepath)
+            print "Deleted"
         except OSError as e:
-            print "Tried to delete a file that doesn't exist. No big deal"
-
+            False
+            
     def serialize(self):
         return {
             "format": self.format,
@@ -180,7 +181,8 @@ class Download:
             "content_type": self.content_type,
             "total": self.total,
             "dimensions": self.dimensions,
-            "file_size": self.file_size
+            "file_size": self.file_size,
+            "filepath": self.filepath
         }
 
 

@@ -111,7 +111,6 @@ for i, package in enumerate(packages['result']):
             dl.analyze()
 
         if(not(cfg.keep_data)):
-            print "Delete"
             dl.delete_file()
 
     dump(datasets)

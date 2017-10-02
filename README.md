@@ -10,6 +10,11 @@ First of all you should set all the options in `config.py` to your preference.
 
 The dependecies are:
 
-* Python 2.7
-* Node
+* Python 2.7 and everything in `requirements.txt`
+* Node.js
 
+And that is basically it. You can now run:
+
+    python main.py
+
+in your console.

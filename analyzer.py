@@ -68,6 +68,7 @@ class Analyzer:
 
                 self.dimensions['columns'] = cols
                 self.dimensions['rows'] = lines
+                download.status = "Analyzed"
             
             except Exception as e:
                 return "csv exception"
@@ -88,6 +89,7 @@ class Analyzer:
                 total = total * dim
 
             download.real_format = download.format
+            download.status = "Analyzed"
             return total
         except Exception as e:
             return 'axis exception'
@@ -158,6 +160,7 @@ class Analyzer:
                             print(e)
 
                 # Priority goes to Shapefiles. If there are none, return the count of images in the ZIP
+                download.status = "Analyzed"
                 return total if (download.real_format == 'SHP') else total_images                
         except Exception as general_exception:
             print general_exception
@@ -185,6 +188,7 @@ class Analyzer:
                 total = total + (cols * rows)
 
             download.real_format = "XLS"
+            download.status = "Analyzed"
             return total
         except Exception as e:
             print download.path + ": " + str(e)
@@ -202,4 +206,5 @@ class Analyzer:
             return "no download"
 
         download.real_format = "Other"
+        download.status = "Analyzed"
         return 'undefined'
