@@ -4,6 +4,7 @@ import json
 import time
 from dataset import Dataset
 import os
+import config as cfg
 
 # Data-Structure:
 #
@@ -24,16 +25,9 @@ import os
 #   size
 
 
-min_number = 1900 
-max_number = 5000
-result_json = 'opendata.swiss.datasets.json'
-
-
-keep_data = True
-
 
 def dump(datasets):
-    with open(result_json, 'w') as fp:
+    with open(cfg.output_file, 'w') as fp:
         fp.write(
             json.dumps(
                 [dataset.serialize() for dataset in datasets],
@@ -45,7 +39,7 @@ def dump(datasets):
 
 def resume():
     try:
-        with open(result_json, 'r') as file:
+        with open(cfg.output_file, 'r') as file:
             datasets = []
             for dataset in json.load(file):
                 dataset_object = Dataset(dataset, True)
@@ -77,8 +71,8 @@ for i, package in enumerate(packages['result']):
     dataset_name = package #packages['result'][i]
     dataset = None
 
-    if (i > max_number): break
-    if (i < min_number): continue
+    if (i > cfg.finish_at): break
+    if (i < cfg.start_from): continue
 
     exists = False
     for ds in datasets:
@@ -116,7 +110,8 @@ for i, package in enumerate(packages['result']):
             print "Analyzing..."
             dl.analyze()
 
-        if(not(keep_data) and dl.status == "Analyzed"):
+        if(not(cfg.keep_data)):
+            print "Delete"
             dl.delete_file()
 
     dump(datasets)

@@ -4,6 +4,7 @@ import requests
 from analyzer import Analyzer
 from lxml import etree
 import StringIO
+import config as cfg
 
 # Status
 # 0. Untouched
@@ -15,6 +16,7 @@ class Download:
 
     def __init__(self):
         self.format = ''
+        self.real_format = ''
         self.url = ''
         self.created = ''
         self.issued = ''
@@ -24,10 +26,11 @@ class Download:
         self.id = str(uuid.uuid4())
         self.dataset = None
         self.status = 'Untouched'
-
+        self.path = cfg.data_dir 
 
     def __init__(self, json, url, dataset):
         self.format = json.get("format")
+        self.real_format = json.get("real_format")
         self.url = url
         self.created = json.get("created")
         self.issued = json.get("issued")
@@ -44,14 +47,14 @@ class Download:
         self.total = json.get('total', '')
         self.dimensions = json.get('dimensions', '')
         self.file_size = json.get('file_size', '')
+        self.path = cfg.data_dir
 
-        print self.path
+
 
 
     def download(self):
 
         self.set_dir()
-
         path = self.get_dir() + '/' + self.id
 
 
@@ -123,36 +126,47 @@ class Download:
 
 
     def set_dir(self):
+
+        try:
+            if not os.path.exists(self.path):
+                os.makedirs(self.path)
+        except Exception as e:
+            print "Couldn't find nor create the target directory for the data"
+            raise e
+
         # Creating the directory structure -> organization/dataset
         try:
-            orga_directory = self.dataset.organization_name
-            if not os.path.exists(orga_directory):
-                os.makedirs(orga_directory)
+            self.path = self.path + "/" + self.dataset.organization_name
+            if not os.path.exists(self.path):
+                os.makedirs(self.path)
         except Exception as e:
             print self.dataset.name + ": Orga dir: " + str(e)
 
         try:
-            dataset_directory = orga_directory + '/' + self.dataset.id
-            if not os.path.exists(dataset_directory):
-                os.makedirs(dataset_directory)
+            self.path = self.path + '/' + self.dataset.id
+            if not os.path.exists(self.path):
+                os.makedirs(self.path)
         except Exception as e:
             print self.dataset.name + ": Dataset dir: " + str(e)
 
 
     def get_dir(self):
-        return self.dataset.organization_name + '/' + self.dataset.id
+        return self.path
 
 
     def analyze(self):
         Analyzer().analyze(self)
 
-    def delet_file(self):
-        if(self.status == "Analyzed"):
+    def delete_file(self):
+        try:
             os.unlink(self.path)
+        except OSError as e:
+            print "Tried to delete a file that doesn't exist. No big deal"
 
     def serialize(self):
         return {
             "format": self.format,
+            "real_format": self.real_format,
             "url": self.url,
             "created": self.created,
             "issued": self.issued,

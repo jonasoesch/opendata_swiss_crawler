@@ -5,6 +5,8 @@ import shapefile
 import os, errno
 import re
 import shutil
+import xlrd
+import chardet
 
 class Analyzer:
 
@@ -12,7 +14,6 @@ class Analyzer:
         self.dimensions = {}
 
     def analyze(self, download):
-
         total = None
 
         if(download.format == 'CSV'):
@@ -26,7 +27,7 @@ class Analyzer:
         elif(download.format == 'MULTIFORMAT'):
             total = self.do_multiformat(download)
         elif(download.format == 'tab-separated-values'):
-            total = self.do_tsv(download)
+            total = self.do_csv(download)
         else:
             total = self.do_undef(download)
 
@@ -37,80 +38,116 @@ class Analyzer:
         download.total = total
         download.dimensions = self.dimensions
 
-        if total != 'undefined' or total != '' or total != 'undefined':
-            download.status = "Analyzed"
 
-        #download['fields'] = total
-        #download['dimensions'] = self.dimensions
-
-
+    def no_download(self, download):
+        if not(download):
+            return True
+        if not(download.path):
+            return True
+        return False
 
     def do_csv(self, download):
         lines = 0
         cols = 0
 
-        if not(download):
-            return
-        if not(download.path):
-            return
+        if self.no_download(download):
+            return 'no download'
 
         with open(download.path, 'r') as file:
             try:
-                dialect = unicodecsv.Sniffer().sniff(file.read(8192))
+                dialect = unicodecsv.Sniffer().sniff(file.read(8192)) # Trying to find out the separators
                 file.seek(0)
-                reader = unicodecsv.reader(file, dialect)
-                cols = len(reader.next())
+                encoding = chardet.detect(file.read(8192)) # Trying to find out the encoding of the file
+                file.seek(0) # Reset to start
+                
+                reader = unicodecsv.reader(file, dialect, encoding=encoding['encoding'])
+                cols = len(reader.next()) # Count the number of columns in the first line
                 for j, l in enumerate(file):
                     pass
                 lines = j + 1
 
                 self.dimensions['columns'] = cols
                 self.dimensions['rows'] = lines
-
+            
             except Exception as e:
-                print e
-                return 'csv exception'
+                return "csv exception"
+
+        download.real_format = download.format
         return lines * cols
 
     def do_axis(self, download):
+        
+        if self.no_download(download):
+            return 'no download'
+        
         try:
-            arr =  eval(subprocess.check_output(['node', '/Users/jonas/Desktop/analyzer/pc-axis.js', download.path]))
+            arr =  eval(subprocess.check_output(['node', './analyzer/pc-axis.js', download.path]))
             total = 1
             self.dimensions['dims'] = str(arr)
             for dim in arr:
                 total = total * dim
+
+            download.real_format = download.format
             return total
         except Exception as e:
-            print e
             return 'axis exception'
 
+
     def do_zip(self, download):
+
+        if self.no_download(download):
+            return "no download"
+        
+
+        total = 0
+        total_images = 0
         try:
             with zipfile.ZipFile(download.path, 'r') as myzip:
-                for zipname in myzip.namelist():
-                    if re.search('\.shp$', zipname) != None:
-                        try:
-                            os.makedirs('tmp')
-                        except OSError as e:
-                            if e.errno != errno.EEXIST:
-                                raise
+
+                files = myzip.namelist()
+
+                img_pattern = re.compile('\.(jpeg|jpg|JPG|JPEG|png|PNG|tif|TIF|tiff|TIFF|gif|GIF)$')
+                img_files = len(filter(img_pattern.search, files))
+                if(img_files > 0):
+                    download.real_format = 'Image'
+                    total_images = img_files
+
+                expr = re.compile('\.shp$')
+                for shp_name in filter(expr.search, files):
+                    
+                    # Setting up the tmp dir if necessary
+                    try:
+                        os.makedirs('tmp')
+                    except OSError as e:
+                        if e.errno != errno.EEXIST:
+                            raise
+
+                    # Extracting all the files to tmp
+                    try:
+                        myzip.extractall('tmp')
+                    except Exception as e :
+                        print e
+                        return 'zip exception'
+                    
+                    # Reading the shapefileLCAfood_16080600.nx1
+                    try:
+                        sf = shapefile.Reader("tmp/"+shp_name)
+                    except Exception as e:
+                        print e
+                        return "shp exception"
 
 
-                        try:
-                            myzip.extractall('tmp')
-                            sf = shapefile.Reader("tmp/"+zipname)
-                        except Exception as e :
-                            print e
-                            return 'zip exception'
-                        points = len(sf.records())
-                        attributes = len(sf.records()[0])
+                    points = len(sf.records())
+                    attributes = len(sf.records()[0])
 
-                        self.dimensions['points'] = points
-                        self.dimensions['attributes'] = attributes
+                    self.dimensions['points'] = points
+                    self.dimensions['attributes'] = attributes
 
-                        return points * attributes
+                    download.real_format = 'SHP'
+                    total = total + (points * attributes)
 
-
+                    # Remove all the files
+                    # TODO: ZIP is extracted multiple times if there is more than one shapefile
                     for the_file in os.listdir('tmp'):
                         file_path = os.path.join('tmp', the_file)
                         try:
@@ -119,42 +156,37 @@ class Analyzer:
                             elif os.path.isdir(file_path): shutil.rmtree(file_path)
                         except Exception as e:
                             print(e)
+
+                # Priority goes to Shapefiles. If there are none, return the count of images in the ZIP
+                return total if (download.real_format == 'SHP') else total_images                
         except Exception as general_exception:
             print general_exception
             return 'zip exception'
 
+
     def do_xls(self, download):
-        if not(download):
-            return
 
-        if not(download.path):
-        	return
-        
-        copy_path = download.path + '.xlsx'
-        try:
-            shutil.copy(download.path, copy_path)
-        except Exception as e:
-            return "copying Excel failed"
+        if self.no_download(download):
+            return "no download"
 
         try:
-            wb = load_workbook(copy_path, read_only=True)
+            wb = xlrd.open_workbook(download.path)
 
             total = 0
-            self.dimensions['sheets'] = len(wb.get_sheet_names())
-            for sheet in wb.get_sheet_names():
-                cols = wb[sheet].max_column
-                rows = wb[sheet].max_row
+            self.dimensions['sheets'] = wb.nsheets
+
+            for i in range(0, wb.nsheets):
+                cols = wb.sheet_by_index(i).ncols
+                rows = wb.sheet_by_index(i).nrows
 
                 self.dimensions['columns'] = cols
                 self.dimensions['rows'] = rows
 
                 total = total + (cols * rows)
 
-            os.remove(copy_path)
-
+            download.real_format = "XLS"
             return total
         except Exception as e:
-            os.remove(copy_path)
             print download.path + ": " + str(e)
             return "Excel exception"
 
@@ -163,26 +195,11 @@ class Analyzer:
             return self.do_zip(download)
 
         except Exception as e:
-            print download.path + ': ' + str(e)
+            return "Multiformat exception"
 
     def do_undef(self, download):
+        if self.no_download(download):
+            return "no download"
+
+        download.real_format = "Other"
         return 'undefined'
-
-    def do_tsv(self, download):
-        lines = 0
-        cols = 0
-        with open(download.path, 'r') as file:
-            try:
-                reader = unicodecsv.reader(file, dialect='excel-tab')
-                cols = len(reader.next())
-                for j, l in enumerate(file):
-                    pass
-                lines = j + 1
-
-                self.dimensions['columns'] = cols
-                self.dimensions['rows'] = lines
-
-            except Exception as e:
-                print e
-                return 'tsv exception'
-            return lines * cols

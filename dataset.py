@@ -1,4 +1,5 @@
 from download import Download
+import unicodecsv
 
 class Dataset:
 
@@ -17,6 +18,7 @@ class Dataset:
         self.tags = self.parse_tags(result.get("groups"))
         self.downloads = self.parse_downloads(result.get("resources"))
         self.id = result.get("name")
+        self.visits = result.get('visits')
 
     def init_from_json(self, json):
         self.name = json.get('name')
@@ -26,6 +28,7 @@ class Dataset:
         self.tags = json.get('tags')
         self.downloads =  [Download(download, download.get('url'), self) for download in json['downloads']]
         self.id = json.get('id')
+        self.visits = json.get('visits', 0)
 
     def parse_name(self, name):
         if(name == None):
@@ -61,6 +64,15 @@ class Dataset:
 
 
 
+    def merge_dl_number(self, path):
+        self.visits = 0
+        with open(path, 'r') as downloads:
+            downloads = unicodecsv.reader(downloads, delimiter=";")
+            for row in downloads:
+                if(self.id in row[0]):
+                    self.visits = self.visits + int(row[2])
+
+
     def serialize(self):
         return {
             "name": self.name,
@@ -72,4 +84,5 @@ class Dataset:
             "tags": self.tags,
             "downloads": ([download.serialize() for download in self.downloads]),
             "id": self.id,
+            "visits": self.visits
         }
