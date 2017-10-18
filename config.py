@@ -10,8 +10,8 @@ keep_data = False
 output_file = "/Users/jonas/Desktop/opendata_swiss_crawler/opendata.swiss.datasets.json"
 
 
-start_from = 600
-finish_at = 607
+start_from = 490
+finish_at = 5000
 
 
 

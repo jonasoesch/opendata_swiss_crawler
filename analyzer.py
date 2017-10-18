@@ -82,7 +82,7 @@ class Analyzer:
             return 'no download'
         
         try:
-            arr =  eval(subprocess.check_output(['node', './analyzer/pc-axis.js', download.path]))
+            arr =  eval(subprocess.check_output(['node', './pcaxis/pc-axis.js', download.path]))
             total = 1
             self.dimensions['dims'] = str(arr)
             for dim in arr:
