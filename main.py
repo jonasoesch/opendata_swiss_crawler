@@ -27,13 +27,17 @@ import config as cfg
 
 
 def dump(datasets):
-    with open(cfg.output_file, 'w') as fp:
+    tempfile = cfg.output_file + '.tmp'
+    with open(tempfile, 'w') as fp:
         fp.write(
             json.dumps(
                 [dataset.serialize() for dataset in datasets],
                 indent=4, separators=(',', ': ')
             )
         )
+        fp.flush(); # Paranoid writing to disk as in https://stackoverflow.com/questions/2333872/atomic-writing-to-file-with-python
+        os.fsync(fp.fileno());
+    os.rename(tempfile, cfg.output_file)
 
 
 

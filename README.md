@@ -18,3 +18,5 @@ And that is basically it. You can now run:
     python main.py
 
 in your console.
+
+One complete run takes about 3 hours in order to analyze 2500 datasets.
