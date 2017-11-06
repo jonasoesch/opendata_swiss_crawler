@@ -1,0 +1,5 @@
+# .gitignore
+
+# Python
+*.pyc
+.python-version
