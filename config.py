@@ -1,7 +1,7 @@
-# In order to analyze them, the datasets are downloaded. 
+# In order to analyze them, the datasets are downloaded.
 # If you want to keep them ('keep_data'), this takes a lot of space
 # Here you have the option to change the output dir
-data_dir = "/Users/jonas/Desktop/opendata_swiss_crawler/data"
+data_dir = "/Users/jonas/Desktop/opendata_swiss_crawler/temp"
 
 # Stores all the data, which takes 100+ GB for the whole platform
 keep_data = False
@@ -10,8 +10,5 @@ keep_data = False
 output_file = "/Users/jonas/Desktop/opendata_swiss_crawler/opendata.swiss.datasets.json"
 
 
-start_from = 490
+start_from = 0 
 finish_at = 5000
-
-
-

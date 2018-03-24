@@ -73,6 +73,10 @@ class Download:
             return self.update_with_dl_information(error='too many redirects')
         except requests.exceptions.HTTPError:
             return self.update_with_dl_information(status_code=r.status_code, error='http')
+        except requests.exceptions.MissingSchema:
+            if not("http://" in self.url):
+                self.url = "http://"+self.url
+                return self.download()
 
         try:
             # Write to file
