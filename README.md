@@ -19,4 +19,16 @@ And that is basically it. You can now run:
 
 in your console.
 
-One complete run takes about 3 hours in order to analyze 2500 datasets.
+One complete run takes about 16 hours in order to download and analyze over 3000 datasets.
+
+## Results
+
+The result of the analysis is stored at the `output_file` path that is defined in the `config.py` file. Examples of previous runs can be found in the `data` directory.
+
+## Visualisation
+
+Opening the `index.html` file displays a visualization of a data file. By default it uses one of the existing files in `data` from a previous analysis. If you want to modify it to display the data from your own run, it's not very hard, although the code is a bit messy. You need to set the variable `dataset` in `index.html` to the path of you output file.
+
+### Visits
+
+The visits data is not open. Therefore this tab doesn't work in the visualization. Sorry about that.

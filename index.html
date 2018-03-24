@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<html>
+    <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width; initial-scale=1.0;">
 <style>
@@ -202,7 +204,8 @@
 
 
 </style>
-
+</head>
+<body>
 <div id="chart">
     <div id="chart-info">
         <h2>Datensätze auf opendata.swiss </h2>
@@ -331,15 +334,12 @@
     <li id="perspective-visits" class="perspective"><button>Häufig besucht</button></li>
 </ul>
 
-<body>
 <script src="d3.v4.min.js"></script>
 <script>
 
-    var l = console.log;
+   var dataset = 'data/20180322_opendata.swiss.datasets.json'; 
 
     
-
-
     // Dimensions of sunburst.
     var width = document.body.clientWidth * 0.9;
     var height = width;
@@ -471,7 +471,7 @@
         info(node)
     }
 
-    d3.json('data/20180322_opendata.swiss.datasets.json', function(json) {
+    d3.json(dataset, function(json) {
 
         var top = {"name": "opendata.swiss"},
         root, path;
@@ -744,4 +744,6 @@
 
 
 </script>
+</body>
+</html>
 
