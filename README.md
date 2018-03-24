@@ -27,6 +27,8 @@ The result of the analysis is stored at the `output_file` path that is defined i
 
 ## Visualisation
 
+![visualization](assets/visualisation.png)
+
 Opening the `index.html` file displays a visualization of a data file. By default it uses one of the existing files in `data` from a previous analysis. If you want to modify it to display the data from your own run, it's not very hard, although the code is a bit messy. You need to set the variable `dataset` in `index.html` to the path of you output file.
 
 ### Visits
