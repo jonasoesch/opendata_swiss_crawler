@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html>
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width; initial-scale=1.0;">
+<style>
+
+    body {
+        background-color: #D9D9D6;
+    }
+
+    #chart {
+        position: relative;
+        padding: 5%
+    }
+
+    text {
+        z-index: 10;
+        position: absolute;
+    }
+
+    #chart-info {
+        padding-top: 2%;
+        position: absolute;
+        width: 400px;
+        height: 0;
+        overflow: visible;
+        pointer-events: none;
+        text-align: center;
+        vert-align: middle;
+        font-family: sans-serif;
+        font-size: 0.6em;
+    }
+
+    #chart-info p{
+        margin-top: 35%;
+    }
+
+
+    #chart-datasets {
+        position: absolute;
+        overflow:scroll;
+    }
+
+    .highlight {
+        color: red
+    }
+
+    #chart-datasets {
+        font-family: sans-serif;
+        font-size: 0.7em;
+    }
+
+    .perspective {
+        display: inline-block;
+        list-style: none;
+    }
+
+
+    .buttongroup {
+        width: 100%;
+        text-align: center;
+        -webkit-padding-start: 0;
+        padding: 0;
+    }
+
+    .buttongroup button {
+        background: none;
+        border: 1px solid #777;
+        color: inherit;
+        font: inherit;
+        line-height: normal;
+        padding: 5px;
+        margin: 0;
+        box-sizing: border-box;
+        font-family: sans-serif;
+        font-size: 0.7em;
+        border-bottom-width: 3px;
+    }
+
+    .buttongroup button:active, .perspective[active=true] button {
+        border-bottom-width: 1px;
+        position: relative;
+        top: 2px;
+    }
+
+    .buttongroup li {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        margin-left: -5px;
+    }
+
+    .buttongroup li:first-child button{
+        border-radius: 5px 0 0 5px;
+    }
+
+    .buttongroup li:last-child button {
+        border-radius: 0 5px 5px 0;
+        margin-left: 0;
+    }
+
+    .buttongroup li[active=true] button {
+        background-color: aliceblue;
+        outline: none;
+    }
+
+    .legend {
+        position: absolute;
+    }
+
+
+
+    #legend-inner {
+        right: 3%;
+        bottom: -50px;
+    }
+
+    #legend-outer {
+        right: auto;
+        left: 3%;
+        bottom: -50px;
+        padding: 0;
+    }
+
+    @media (max-width: 570px) {
+
+        #chart {
+            font-size: 0.9em;
+        }
+        #legend-inner {
+            padding: 0;
+            bottom: -220px;
+            left: 0;
+        }
+
+        #legend-outer {
+            bottom: -380px;
+            left: 0;
+            padding-bottom: 20px;
+        }
+    }
+
+    .legend li {
+        list-style: none;
+        font-family: sans-serif;
+        font-size: 0.7em;
+    }
+
+    .legend svg {
+        position: relative;
+        top: 7px;
+        margin-right: 3px;
+    }
+
+    .popup {
+        background-color: #fff;
+        position:absolute;
+        display: inline-block;
+        background-color: rgba(255, 1255, 255, 1);
+        padding: 10px;
+        border-radius: 3px;
+        font-size: 0.8em;
+        top: -25px;
+        left: 0px;
+        border: 1px solid #7F7F7F;
+    }
+
+    .popup a {
+        text-decoration: none;
+        color: #236B8E;
+        font-family: sans-serif;
+        border-bottom: 1px solid;
+        line-height: 1.4em;
+    }
+
+    .popup:before {
+        content: '';
+        position: absolute;
+        border-style: solid;
+        border-width: 0  10px 12px;
+        border-color: #7F7F7F transparent;
+        display: block;
+        width: 0;
+        z-index: 0;
+        margin-left: -12px;
+        top: -12px;
+        left: 30px;
+    }
+
+    .popup:after {
+        content: '';
+        position: absolute;
+        border-style: solid;
+        border-width: 0  10px 12px;
+        border-color: rgba(255, 255, 255, 1) transparent;
+        display: block;
+        width: 0;
+        z-index: 1;
+        margin-left: -12px;
+        top: -11px;
+        left: 30px;
+    }
+
+
+</style>
+</head>
+<body>
+<div id="chart">
+    <div id="chart-info">
+        <h2>Datensätze auf opendata.swiss </h2>
+    </div>
+    <ul class="legend" id="legend-inner">
+        <li><strong>Innen: <br />Datenerzeuger</strong></li>
+        <li>
+            <svg width="21px" height="21px" viewBox="0 0 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <rect id="Rectangle-6-Copy-17" fill="#27100B" x="0" y="0" width="21" height="21"></rect>
+                </g>
+            </svg>
+            Bund </li>
+        <li>
+
+            <svg width="21px" height="21px" viewBox="0 0 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch -->
+                <desc>Created with Sketch.</desc>
+                <defs></defs>
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <rect id="Rectangle-6-Copy-11" fill="#AA391E" x="0" y="0" width="21" height="21"></rect>
+                </g>
+            </svg>
+            Kanton
+        </li>
+        <li>
+
+            <svg width="21px" height="21px" viewBox="0 0 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch -->
+                <desc>Created with Sketch.</desc>
+                <defs></defs>
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <rect id="Rectangle-6-Copy-11" fill="#FF947A" x="0" y="0" width="21" height="21"></rect>
+                </g>
+            </svg>
+            Gemeinde
+        </li>
+        <li>
+            <svg width="21px" height="21px" viewBox="0 0 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch -->
+                <defs></defs>
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <rect id="Rectangle-6-Copy-9" fill="#FFFFFF" x="0" y="0" width="21" height="21"></rect>
+                </g>
+            </svg>
+            Organisation
+        </li>
+    </ul>
+    <ul class="legend" id="legend-outer">
+        <li><strong>Aussen: Datentyp</strong></li>
+        <li>
+
+            <svg width="21px" height="21px" viewBox="0 0 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch -->
+                <desc>Created with Sketch.</desc>
+                <defs></defs>
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="Group-4" transform="translate(-167.000000, -194.000000)">
+                        <g id="Group-10" transform="translate(167.000000, 194.000000)">
+                            <rect id="Rectangle-6-Copy-4" fill="#44A0C9" x="0" y="0" width="21" height="21"></rect>
+                            <rect id="Rectangle-6-Copy-14" fill="#3C7A95" x="0" y="0" width="10.5" height="21"></rect>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+            Tabellarische Daten
+        </li>
+        <li>
+
+            <svg width="21px" height="21px" viewBox="0 0 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch -->
+                <desc>Created with Sketch.</desc>
+                <defs></defs>
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="Group-4" transform="translate(-166.000000, -221.000000)">
+                        <g id="Group-9" transform="translate(166.000000, 221.000000)">
+                            <rect id="Rectangle-6-Copy-2" fill="#EFCF47" x="0" y="0" width="21" height="21"></rect>
+                            <rect id="Rectangle-6-Copy-13" fill="#EFC047" x="0" y="0" width="10.5" height="21"></rect>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+            Geodaten
+        </li>
+        <li>
+
+            <svg width="21px" height="21px" viewBox="0 0 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch -->
+                <desc>Created with Sketch.</desc>
+                <defs></defs>
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="Group-4" transform="translate(-167.000000, -167.000000)">
+                        <g id="Group-11" transform="translate(167.000000, 167.000000)">
+                            <rect id="Rectangle-6-Copy-5" fill="#5FA7A1" x="0" y="0" width="21" height="21"></rect>
+                            <rect id="Rectangle-6-Copy-15" fill="#4C9992" x="0" y="0" width="10.5" height="21"></rect>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+            Bilddaten
+        </li>
+        <li>
+
+            <svg width="21px" height="21px" viewBox="0 0 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <!-- Generator: Sketch 45.2 (43514) - http://www.bohemiancoding.com/sketch -->
+                <desc>Created with Sketch.</desc>
+                <defs></defs>
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="Group-4" transform="translate(-166.000000, -249.000000)">
+                        <g id="Group-12" transform="translate(166.000000, 249.000000)">
+                            <rect id="Rectangle-6-Copy-6" fill="#CCC2AA" x="0" y="0" width="21" height="21"></rect>
+                            <rect id="Rectangle-6-Copy-16" fill="#B7AA8A" x="0" y="0" width="10.5" height="21"></rect>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+            Nicht identifizierte
+        </li>
+    </ul>
+</div>
+
+<ul id="chart-perspectives" class="buttongroup">
+    <li id="perspective-count" active="true" class="perspective"><button>Datensätze</button></li>
+    <li id="perspective-size" class="perspective"><button>Dateigrösse</button></li>
+    <li id="perspective-fields" class="perspective"><button>Einträge</button></li>
+    <li id="perspective-visits" class="perspective"><button>Häufig besucht</button></li>
+</ul>
+
+<script src="d3.v4.min.js"></script>
+<script>
+
+   var dataset = 'data/20180322_opendata.swiss.datasets.json'; 
+
+    
+    // Dimensions of sunburst.
+    var width = document.body.clientWidth * 0.9;
+    var height = width;
+    var radius = Math.min(width, height) / 2;
+
+
+
+    function color(dataset) {
+
+        var ebene = {
+            "confederation": "#27100B",//"#0F2D40",
+            "canton": "#AA391E",
+            "commune": "#FF947A",
+            "other": "#FFFFFF"//"#CCC0A1"
+        };
+
+        if (dataset.depth === 0) return "transparent";
+        if (dataset.depth === 1) return ebene[dataset.data.values[0].organization['political_level']];
+
+
+        // Deciding on the file format based on the largest download. Best likelihood to be correct for larger datasets.
+        var downloads = dataset.data.downloads.sort(function(a, b) {return a.file_size < b.file_size});
+        var formats = (downloads.length > 0 && downloads[0].real_format) ? downloads[0].real_format : "None";
+
+        downloads.forEach(function(dl) {
+            if(dl.url.indexOf("/wms") > -1) {
+                formats = "WMS"
+
+            }
+        });
+
+        // Modification of the Vitamin-C colorscheme
+        if ((formats.indexOf('SHP') != -1)) return "#FFAF43"// "#BEDB39"; // Shapefile
+        if ((formats.indexOf('WMS') != -1)) return "#FFAF43"// "#BEDB39"; // Shapefile
+        if (formats.indexOf('CSV') != -1) return "#44A0C9"//"#4B8AA6"; //"#28708F";
+        if (formats.indexOf('PC-AXIS') != -1) return  "#44A0C9"//"#EFCF47"//"#1F8A70";
+        if (formats.indexOf('XLS') != -1) return "#44A0C9" //"#FD7400";
+        if (formats.indexOf('tab-separated-values') != -1) "#44A0C9" //return "#FF9B81" //"#66B9D9";
+        if (formats.indexOf('Image') != -1) return "#5FA7A1" // "#D98086";
+
+        return "#CCC2AA"//"#268bd2";
+
+    }
+
+
+    // Center the info-display
+    d3.select('#chart-info')
+        .attr('style', "left: "+ (width / 3.3) +"px; top: "+ (height / 2 - height/10) +"px; width: "+width/2+"px;");
+
+
+
+    // Center to coordinate syste -> 0/0 is in the middle
+    var vis = d3.select("#chart").append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        //.style('shape-rendering', 'optimizeSpeed')
+        .append("g")
+        .attr("id", "container")
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")"); // center the container
+
+
+    var partition = d3.partition();
+
+    var x = d3.scaleLinear()
+        .range([0, 2 * Math.PI]);
+
+    var y = d3.scaleSqrt()
+        .range([0, radius]);
+
+    var arc = d3.arc()
+        .startAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x0))); })
+        .endAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x1))); })
+        .innerRadius(function(d) { return Math.max(0, y(d.y0)); })
+        .outerRadius(function(d) { return Math.max(0, y(d.y1)); });
+
+    var node, currPerspective;
+
+
+    function draw(root, firstTime, perspective) {
+        if (firstTime) {
+            partition(root)
+                .sum(function(d){ return getValueFromCount(d)})
+                .sort(function(a, b) { return b.value - a.value})
+
+            // Because each level counts itself in the `value`
+            root.value = root.value - root.children.length
+            root.children.forEach((child) => child.value = child.value -1)
+
+            path = vis.selectAll('path')
+                .data(partition(root).descendants())
+                .enter().append('path')
+                //.style("stroke", function(d){ l(d.x1-d.x0); return (d.x1-d.x0 > 0.001) ?  "#fff" : ""})
+                .style("fill", function(d, i){ return i%2 === 0 ? color(d) : d3.rgb(color(d)).darker(0.5)})
+                .on('mouseover', mouseover)
+                .on('click', onclick);
+
+
+
+        } else {
+            partition(root)
+                .sum(function(d){return getValueFrom(d, perspective)})
+                .sort(function(a, b) { return b.value - a.value});
+
+            if(node.value === 0) {
+                partition(root)
+                    .sum(function(d){return getValueFromCount(d)})
+            }
+
+            path = d3.selectAll('path')
+                .data(partition(root)
+                    .descendants())
+
+        }
+        path
+            //.filter(function(d) {l(d.x1 -d.x0); return (d.x1 - d.x0) > 0.004})
+            .transition().duration(200).attrTween("d", arcTweenData)
+            //.style("fill", function(d, i){ return color(d)})
+            .style("fill", function(d, i){
+                if (d.depth == 2) {
+                    return i%2 === 0 ? color(d) : d3.rgb(color(d)).darker(0.3)
+                } else {
+                    return color(d);
+                }});
+
+        path
+            .filter(function(d) { return d.depth === 1})
+            .attr('stroke', '#ccc');
+
+        info(node)
+    }
+
+    d3.json(dataset, function(json) {
+
+        var top = {"name": "opendata.swiss"},
+        root, path;
+
+
+        top.values = d3.nest()
+            .key(function(d){return d.organization.name})
+            .entries(json);
+
+
+        root = d3.hierarchy(top, function(d) {return d.values});
+
+        node = root;
+
+        draw(node, true);
+
+        d3.selectAll('.perspective')
+            .on('click', function() {
+                var perspective = this.getAttribute('id');
+
+                d3.selectAll('.perspective[active=true]').attr('active', 'false');
+                d3.select(this).attr('active', true);
+
+                if(perspective === "perspective-visits") { currPerspective = 'visits'}
+                if(perspective === "perspective-count") { currPerspective = undefined }
+                if(perspective === "perspective-size") { currPerspective = 'size'}
+                if(perspective === "perspective-fields") { currPerspective = 'fields'}
+
+               draw(root, false, currPerspective);
+
+            });
+
+    });
+
+
+    d3.select("#container").on("mouseleave", mouseleave);
+
+
+    function getValueFrom(d, perspective) {
+        if(perspective === "visits") { return getValueFromVisits(d)};
+        if(perspective === "size") { return getValueFromSize(d)};
+        if(perspective === "fields") { return getValueFromFields(d) };
+        return getValueFromCount(d);
+    }
+
+
+    function arcTweenData(a, i) {
+
+        var oi = d3.interpolate({ x0: (a._x0 ? a._x0 : 0), x1: (a._x1 ? a._x1 : 0) }, a);
+        function tween(t) {
+            var b = oi(t);
+            a._x0 = b.x0;
+            a._x1 = b.x1;
+            return arc(b);
+        }
+
+
+        if (i == 0) {
+            // If we are on the first arc, adjust the x domain to match the root node
+            // at the current zoom level. (We only need to do this once.)
+            var xd = d3.interpolate(x.domain(), [node.x0, node.x1]);
+            return function (t) {
+                x.domain(xd(t));
+                return tween(t);
+            };
+        } else {
+            return tween;
+        }
+    }
+
+    function arcTweenZoom(d) {
+        var xd = d3.interpolate(x.domain(), [d.x0, d.x1]),
+            yd = d3.interpolate(y.domain(), [d.y0, 1]), // [d.y0, 1]
+            yr = d3.interpolate(y.range(), [d.y0 ? 40 : 0, radius]);
+        return function (d, i) {
+            return i
+                ? function (t) { return arc(d); }
+                : function (t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); return arc(d); };
+        };
+    }
+
+
+    function onclick(d, evt) {
+
+        d3.select('.popup').remove();
+
+
+       if (d.depth === 2) {
+           var content = "<a href=https://opendata.swiss/de/dataset/" + d.data.id + ">" + d.data.name + "</a>";
+
+           //dialog(d3.event, content);
+            //window.open("https://opendata.swiss/de/dataset/" + d.data.id);
+           return 0;
+        }
+
+        node = d;
+
+        vis.selectAll('path').transition().duration(200).attrTween("d", arcTweenZoom(d));
+
+    }
+
+
+    function dialog(evt, content) {
+
+        d3.select('body').append('div')
+            .attr('class', 'popup')
+            .style('left', (evt.clientX - 30 )+'px')
+            .style('top', ( evt.clientY + 20 )+'px')
+            .html(content)
+    }
+
+    // Fade all but the current sequence, and show it in the breadcrumb trail.
+    function mouseover(d) {
+            // Fade all the segments.
+            d3.selectAll("path")
+                .style("opacity", 0.75);
+
+
+            var sequenceArray = d.ancestors().reverse();
+            // Then highlight only those that are an ancestor of the current segment.
+            vis.selectAll("path")
+                .filter(function (node) {
+                    return (sequenceArray.indexOf(node) >= 0);
+                })
+                .style("opacity", 1);
+
+            info(d);
+            //highlighDatasetInList(d);
+    }
+
+
+    // Restore everything to full opacity when moving off the visualization.
+    function mouseleave(d) {
+            // Deactivate all segments during transition.
+            d3.selectAll("path").on("mouseover", null);
+
+            // Transition each segment to full opacity and then reactivate it.
+            d3.selectAll("path")
+                .transition()
+                .duration(100)
+                .style("opacity", 1)
+                .on("end", function () {
+                    d3.select(this).on("mouseover", mouseover);
+                });
+
+            info(node)
+    }
+
+
+    // Getting the highest total value of the downloads in a dataset
+    // ATTENTION: Mind the risk of cases, where different data is combined as multiple downloads in one dataset
+    function getValueFromFields(dataset) {
+        if('downloads' in dataset) {
+            var total = 0;
+            dataset.downloads.forEach(function(dl){ total = dl.total>0 ? total + dl.total : total});
+            if(total>0) {
+                return total
+            } else {
+                return 0
+            }
+        } else {
+            return 0
+        }
+    }
+
+    function getValueFromVisits(d) {
+        return d.visits > 0 ? d.visits : 0;
+    }
+
+    function getValueFromCount(dataset) {
+        return 1;
+    }
+
+    function getValueFromSize (dataset) {
+        if('downloads' in dataset) {
+            var total = 0;
+            dataset.downloads.forEach(function(dl) {
+                total = total + dl['file_size'];
+            });
+            return total;
+        } else {
+            return 0;
+        }
+    }
+
+    function info(dataset) {
+        var info = d3.select('#chart-info').html('');
+
+        var name = dataset.data.name;
+        name = name ? name : dataset.data.key;
+
+        var color = (node.depth === 1) ? "rgba(255,255,255,0.9)" : "#000";
+        if(dataset.data.organization && dataset.data.organization.political_level == "other")
+            color = "#000";
+        if(dataset.children && 
+            dataset.children[0].data.organization &&
+            dataset.children[0].data.organization.political_level == "other")
+            color = "#000";
+
+
+        info
+            .append('h2')
+            .attr('style', "color: "+color)
+            .html(name);
+
+
+        function getTotal(dataset) {
+            while(dataset.parent) {
+                dataset = dataset.parent;
+            }
+            return dataset.value
+        }
+
+        var text = "";
+        if(currPerspective === 'size') {
+            text = parseInt(dataset.value / 1000000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'") + " MBs"
+            if (parseInt(dataset.value) === 1) text = "0 MB";
+        }
+        else if (currPerspective === 'fields') {
+            text = parseInt(dataset.value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'") + " Einträge"
+            if(parseInt(dataset.value) === 1) text = "0 Einträge" // We set it to one in the data so it doesn't disappear
+
+
+        } else if (currPerspective === 'visits') {
+            text = (dataset.value / getTotal(dataset) * 100).toString().replace(/\.(\d\d)\d+/g, ".$1") + "% der Besuche"
+            if(parseInt(dataset.value) === 1) text = "Keine Besuche"
+
+        } else {
+            text = dataset.value + (dataset.value === 1 ? " Datensatz" : " Datensätze");
+        }
+
+
+
+
+        info
+            .append('p')
+            .attr('style', 'color: '+color)
+            .html(text)
+    }
+
+    function listDatasets(d) {
+        if(('children' in d) && (d.depth > 0)) {
+
+            d3.select('#chart-datasets')
+                .append('ul')
+                .selectAll('li')
+                .data(d.children)
+                .enter().append('li')
+                .html(function (d) {
+                    return d.data.name
+                })
+        } else {
+            d3.select('#chart-datasets').html('')
+        }
+    }
+
+    function highlighDatasetInList(dataset) {
+        var list = d3.select('#chart-datasets');
+
+        d3.selectAll('.highlight')
+            .attr('class', '');
+
+        if(list && list.html().length > 0)
+            d3.selectAll('#chart-datasets li')
+                .filter(function(){
+                    return d3.select(this).html() === dataset.data.name
+                })
+                .attr('class', 'highlight')
+    }
+
+
+</script>
+</body>
+</html>
+

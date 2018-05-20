@@ -1,5 +1,48 @@
-# .gitignore
+# Keep only config.sample
+config.py
 
-# Python
-*.pyc
+# Caches
+*.py[cod]
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+.cache
+tests/.cache
+
+# Translations
+*.mo
+
+# Complexity
+output/*.json
+
+# Sphinx
+docs/_build
+
+.webassets-cache
+
+env/
+
+# pyenv
 .python-version
