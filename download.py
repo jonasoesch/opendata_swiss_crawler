@@ -140,7 +140,7 @@ class Download:
 
         # Creating the directory structure -> organization/dataset
         try:
-            self.filepath = self.filepath + "/" + self.dataset.organization_name
+            self.filepath = self.filepath + "/" + self.dataset.organization_name.encode("ascii", "ignore")
             if not os.path.exists(self.filepath):
                 os.makedirs(self.filepath)
         except Exception as e:
