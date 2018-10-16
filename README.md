@@ -34,3 +34,5 @@ Opening the `index.html` file displays a visualization of a data file. By defaul
 ### Visits
 
 The visits data is not open. Therefore this tab doesn't work in the visualization. Sorry about that.
+
+<iframe id="landscape" src="https://jonasoesch.ch/content/02-articles/9-opendata-landscape/cantons/cantons.htmll" width="100%" height="500px"></iframe>
